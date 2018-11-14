@@ -50,8 +50,8 @@ class Form(object):
 
     @staticmethod
     def get_det(matrix):
-        if len(matrix) == 2:
-            return matrix[0][0]*matrix[1][1] - matrix[0][1]*matrix[1][0]
+        if len(matrix) == 1:
+            return matrix[0][0]
         temp = 0
         for i, line in enumerate(matrix):
             temp += (-1)**i*line[0]*Form.get_det([line_[1:] for k, line_ in enumerate(matrix) if k != i])
@@ -65,7 +65,7 @@ class Form(object):
         for row in range(1, len(matrix)):
             temp = 0
             for j in range(row):
-                temp += (-1)**(row+j)*Form.get_det([line[:j]+line[j+1:] for line in matrix[:row]])
+                temp += (-1)**(row+j)*matrix[row][j]*Form.get_det([line[:j]+line[j+1:] for line in matrix[:row]])
             temp += matrix[row][row]*det
             if temp <= 0:
                 return False

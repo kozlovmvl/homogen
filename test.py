@@ -12,4 +12,4 @@ if __name__ == '__main__':
     # matrix = form.is_positive()
     # for line in matrix:
     #     print(line)
-    print(Form.get_det([[1,2,3], [4,5,6], [7,8,9]]))
+    print(Form.silvestr([[1,2,3], [2,1,3], [3,3,1]]))
