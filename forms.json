@@ -1,0 +1,32 @@
+[
+  {
+    "is_positive": true,
+    "dim": 2,
+    "deg": 4,
+    "coeffs": [1, 0, 2, 0, 2]
+  },
+  {
+    "is_positive": false,
+    "dim": 2,
+    "deg": 4,
+    "coeffs": [1, 0, 2, 0, -2]
+  },
+  {
+    "is_positive": true,
+    "dim": 3,
+    "deg": 4,
+    "coeffs": [1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1]
+  },
+  {
+    "is_positive": false,
+    "dim": 2,
+    "deg": 6,
+    "coeffs": [1, 0, 1, 0, 0, 0, 0]
+  },
+  {
+    "is_positive": true,
+    "dim": 2,
+    "deg": 6,
+    "coeffs": [1, 0, 1, 0, 0, 0, 1]
+  }
+]
