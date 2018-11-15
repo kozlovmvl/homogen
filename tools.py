@@ -11,8 +11,8 @@ class Form(object):
         self.num_coeffs = Form.binom(dim + deg - 1, deg)
         if coeffs is not None:
             assert isinstance(coeffs, list), ('Argument \'coeffs\' must be a list')
-            assert len(coeffs) != self.num_coeffs, ('Length of list \'coeffs\' must be equal %s' % self.num_coeffs)
-            assert all(isinstance(c, float) for c in coeffs), ('All coeffs items must have the '
+            assert len(coeffs) == self.num_coeffs, ('Length of list \'coeffs\' must be equal %s' % self.num_coeffs)
+            assert all(isinstance(c, float) or isinstance(c, int) for c in coeffs), ('All coeffs items must have the '
                                                                'type int or float')
         if coeffs:
             self.coeffs = coeffs
@@ -43,7 +43,7 @@ class Form(object):
                     li.insert(0, _deg - i)
                     lines.append(li)
             if _dim == dim:
-                list_monoms.extend([tuple(li) for li in lines])
+                list_monoms.extend(list(tuple(li) for li in lines))
             return lines
         gen(dim, deg)
         return list_monoms
@@ -59,7 +59,7 @@ class Form(object):
 
     @staticmethod
     def silvestr(matrix):
-        if any([line[i] <= 0 for i, line in enumerate(matrix)]):
+        if any(list(line[i] <= 0 for i, line in enumerate(matrix))):
             return False
         det = matrix[0][0]
         for row in range(1, len(matrix)):
@@ -74,11 +74,11 @@ class Form(object):
 
     def __get_matching(self):
         old_monoms = Form.gen_monoms(self.dim, self.deg)
-        indexes_old_monoms = {mon: i for i, mon in enumerate(old_monoms)}
+        indexes_old_monoms = dict((mon, i) for i, mon in enumerate(old_monoms))
         young_monoms = Form.gen_monoms(self.dim, self.deg // 2)
         matching = {}
         for i, mon_1 in enumerate(young_monoms):
-            for j, mon_2 in enumerate(young_monoms[i:]):
+            for j, mon_2 in enumerate(young_monoms[i:], start=i):
                 old_monom = tuple(el + mon_2[k] for k, el in enumerate(mon_1))
                 try:
                     matching[indexes_old_monoms[old_monom]].append((i, j))
@@ -91,23 +91,23 @@ class Form(object):
         return matching, num_add
 
     def __get_q_matrix(self, matching):
-        q_matrix = [[0 for i in range(self.q_dim)] for j in range(self.q_dim)]
+        q_matrix = list(list(0 for i in range(self.q_dim)) for j in range(self.q_dim))
         for old_index, couples in matching.items():
             q_matrix[couples[0][0]][couples[0][1]] = self.coeffs[old_index]
         return q_matrix
 
     def __get_full_matrix(self, matching, args):
         assert len(args) == self.num_add, ('Length of \'args\' must be equal %s' % self.num_add)
-        full_matrix = [[0 for i in range(self.q_dim)] for j in range(self.q_dim)]
+        full_matrix = list(list(0 for i in range(self.q_dim)) for j in range(self.q_dim))
         count = 0
         for old_index, couples in matching.items():
-            full_matrix[couples[0][0]][couples[0][1]] = self.coeffs[old_index] / 2
-            full_matrix[couples[0][1]][couples[0][0]] = self.coeffs[old_index] / 2
+            full_matrix[couples[0][0]][couples[0][1]] += self.coeffs[old_index] / 2
+            full_matrix[couples[0][1]][couples[0][0]] += self.coeffs[old_index] / 2
             if len(couples) == 2:
-                full_matrix[couples[0][0]][couples[0][1]] = args[count] / 2
-                full_matrix[couples[0][1]][couples[0][0]] = args[count] / 2
-                full_matrix[couples[1][0]][couples[1][1]] = -args[count] / 2
-                full_matrix[couples[1][1]][couples[1][0]] = -args[count] / 2
+                full_matrix[couples[0][0]][couples[0][1]] += args[count] / 2
+                full_matrix[couples[0][1]][couples[0][0]] += args[count] / 2
+                full_matrix[couples[1][0]][couples[1][1]] += -args[count] / 2
+                full_matrix[couples[1][1]][couples[1][0]] += -args[count] / 2
                 count += 1
         return full_matrix
 
@@ -117,9 +117,11 @@ class Form(object):
                                                                       'integer or float number')
         assert radius > 0, ('Argument \'radius\' must be positive')
         self.q_dim = Form.binom(self.dim + self.deg // 2 - 1, self.dim - 1)
-        sign = False
-        # превращаем в квадратичные формы
         matching, self.num_add = self.__get_matching()
-        self.area = [[-radius, radius] for i in range(self.num_add)]
-        full_matrix = self.__get_full_matrix(matching, [1,1,1,1,1,1])
-        return full_matrix
+        import random
+        for i in range(100):
+            full_matrix = self.__get_full_matrix(matching, list(random.uniform(-radius, radius)
+                                                                for j in range(self.num_add)))
+            if Form.silvestr(full_matrix):
+                return True
+        return False
