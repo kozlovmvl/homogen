@@ -25,6 +25,10 @@ class Form(object):
             info += '%s = %s\n' % (attr, self.__getattribute__(attr))
         return info
 
+    @property
+    def json(self):
+        return {'dim': self.dim, 'deg': self.deg, 'num_coeffs': self.num_coeffs, 'coeffs': self.coeffs}
+
     @staticmethod
     def binom(n, k):
         if n == 0 or k == 0 or k == n:
@@ -125,3 +129,6 @@ class Form(object):
             if Form.silvestr(full_matrix):
                 return True
         return False
+
+    def to_draw(self):
+        self.coeffs = map(lambda x: -x, self.coeffs)
