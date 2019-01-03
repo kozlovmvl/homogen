@@ -31,6 +31,8 @@ class Form(object):
 
     @staticmethod
     def binom(n, k):
+        assert n >= k, ('Argument n must be more or equal k')
+        assert n >= 0 and k >= 0, ('Arguments n and k must be more or equal 0')
         if n == 0 or k == 0 or k == n:
             return 1
         return Form.binom(n-1, k) + Form.binom(n-1, k-1)
