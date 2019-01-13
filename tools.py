@@ -42,7 +42,7 @@ class Form(object):
         list_monoms = []
         def gen(_dim, _deg):
             if _dim == 1:
-                return [[_deg]]
+                return [(_deg, ), ]
             lines = []
             for i in range(_deg+1):
                 for li in gen(_dim - 1, i):
